@@ -18,6 +18,16 @@ FitForge is an intelligent workout planning app designed to help beginners and f
 The app integrates with Apple HealthKit to monitor sets, reps, and calories burned while providing AI-powered workout suggestions based on individual goals.  
 Users earn achievement badges as they complete workouts, motivating them to stay consistent without needing a personal trainer.
 
+## Walkthrough 
+<div>
+    <a href="https://www.loom.com/share/fe4d96d681754f11a6ef3f8fe1bc9f66">
+    </a>
+    <a href="https://www.loom.com/share/fe4d96d681754f11a6ef3f8fe1bc9f66">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/fe4d96d681754f11a6ef3f8fe1bc9f66-8f0f2009f502a75c-full-play.gif">
+    </a>
+  </div>
+
+
 ### App Evaluation
 
 - **Category:** Health & Fitness  
