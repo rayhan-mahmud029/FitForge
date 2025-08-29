@@ -1,42 +1,62 @@
 import UIKit
 
-final class ViewController: UIViewController, UITableViewDataSource {
+final class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+
     @IBOutlet weak var tableView: UITableView!
 
     private var workouts: [Workout] = []
-    private let client = WGERClient()
+    private let client = ExercisesClient()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.dataSource = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "ExerciseCell")
+        tableView.delegate = self
 
-        // OPTION A: single muscle
-        // let muscleIDs = [1] // biceps
+        // Make cells tall enough for a visible image
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 120
 
-        // OPTION B: fetch for many muscles (first 10 ids 1...10)
-        let muscleIDs = Array(1...10)
+        // IMPORTANT: In Interface Builder, set the prototype cell's
+        // Class = ExerciseCell and Reuse Identifier = "ExerciseCell"
 
-        client.fetchExercises(for: muscleIDs, maxPerMuscle: 10) { [weak self] fetched in
-            print("🎉 fetched \(fetched.count) exercises")
-            self?.workouts = fetched
-            self?.tableView.reloadData()
+        // Keep it fast: 5 muscles × 5 each = 25 rows
+        let muscles = ["chest", "biceps", "triceps"]
+
+        client.fetchTopExercises(for: muscles, perMuscle: 5) { [weak self] items in
+            guard let self else { return }
+            print("🎉 fetched \(items.count) workouts (Ninjas)")
+            self.workouts = items
+            self.tableView.reloadData()
         }
     }
 
-    // MARK: - UITableViewDataSource
+    // MARK: UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("🔢 numberOfRowsInSection:", workouts.count)
+        print("🔢 numberOfRowsInSection: \(workouts.count)")
         return workouts.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print("✅ cellForRowAt:", indexPath.row)
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ExerciseCell", for: indexPath)
+        // Prototype cell in storyboard must have identifier "ExerciseCell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ExerciseCell", for: indexPath) as! ExerciseCell
         let w = workouts[indexPath.row]
-        cell.textLabel?.numberOfLines = 2
-        cell.textLabel?.text = w.name.isEmpty ? "Exercise \(w.id)" : w.name
+        cell.configure(with: w)
         return cell
     }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // MARK: - Pass the selected workout data
+        
+        // Get the index path for the selected row
+        guard let selectedIndexPath = tableView.indexPathForSelectedRow else { return }
+        
+        // Get the selected workout from the workouts array
+        let selectedWorkout = workouts[selectedIndexPath.row]
+        
+        // Get access to the detail view controller via the segue's destination
+        guard let detailVC = segue.destination as? DetailViewController else { return }
+        
+        detailVC.exercise = selectedWorkout
+    }
+    
 }
